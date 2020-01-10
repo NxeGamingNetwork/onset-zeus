@@ -1,9 +1,9 @@
 local config = require('packages/' .. GetPackageName() .. '/server/io/config')
 
 local mod = {
-    name = "Remove Player Permission",
-    description = "Removes a Player Permission from the Group",
-    ui_component = "P(Target)T(Permission)"
+    name = "Remove Admin",
+    description = "Removes a Players Admin Privileges",
+    ui_component = "P(Target)?T(SteamID64)?"
 }
 
 function mod:GetName()
@@ -11,7 +11,20 @@ function mod:GetName()
 end
 
 function mod:GetTarget(player, args)
-    return player -- Return the target of this module
+    local target = nil
+
+    if args[1] ~= nil and IsValidPlayer(args[1]) then
+        target = args[1]
+    elseif args[2] ~= nil then
+        target = args[2]
+    end
+
+    if target == nil then
+        AddPlayerChat(player, FormatMsg("msg-argument-invalid", "Target"))
+        return nil
+    end
+
+    return target
 end
 
 function mod:GetUIComponent()
@@ -27,22 +40,11 @@ function mod:IsToggleable()
 end
 
 function mod:Activate(executor, target, args)
-    if args[1] == nil then
-        AddPlayerChat(executor, FormatMsg("msg-argument-missing", "Player"))
+    if _G.zeus.RemoveAdmin(target) == false then
+        AddPlayerChat(executor, FormatMsg("msg-mod-failed", mod.name, "the player is not an admin"))
         return nil
     end
 
-    if not IsValidPlayer(args[1]) then
-        AddPlayerChat(executor, FormatMsg("msg-argument-invalid", "Player"))
-        return nil
-    end
-
-    if args[2] == nil then
-        AddPlayerChat(executor, FormatMsg("msg-argument-missing", "Permission"))
-        return nil
-    end
-
-    _G.zeus.RemovePlayerPermission(args[1], args[2])
     AddPlayerChat(executor, FormatMsg("msg-mod-success", mod.name))
     return true -- Return false, if any error occurred, or return nil if any error occurred, but the messaging was managed in the function itself
 end

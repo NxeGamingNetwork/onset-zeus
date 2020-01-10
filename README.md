@@ -17,31 +17,26 @@ content["msg-argument-missing"] = "[Zeus] Failed to executed because Argument {1
 content["msg-argument-invalid"] = "[Zeus] Failed to executed because Argument {1} is invalid!"
 content["msg-mod-success"] = "[Zeus] Module {1} was successfully executed!"
 content["msg-mod-disabled"] = "[Zeus] Module {1} was successfully disabled!"
+content["msg-mod-failed"] = "[Zeus] Module {1} failed because {2}!"
 content["msg-banned"] = "You are banned: {1}"
--- VEH SPAWN --
 content["msg-veh-model-not-exist"] = "[Zeus] The Vehicle Model {1} does not exist!"
 
-content["custom-chat"] = false
-content["store-type"] = "LOCAL" -- coming soon: mysql
-content["admins"] = {  } -- Enter SteamID64 in here which will have all permissions
-content["dev-mode"] = true -- Every User on the Server has Admin Permissions, when true
+content["custom-chat"] = false -- coming soon: mysql
+content["store-type"] = "LOCAL" -- or MYSQL
+content["dev-mode"] = true
+
+content["db-host"] = "localhost"
+content["db-user"] = "zeus-db"
+content["db-password"] = "this-is-a-safe-pw"
+content["db-name"] = "zeus-db"
+content["db-charset"] = "utf8mb4"
+
+function GetDatabaseConnection()
+    return content["db-host"], content["db-user"], content["db-password"], content["db-name"]
+end
 
 function IsLocalStorage()
     return content["store-type"] == "LOCAL"
-end
-
-function IsAdmin(steamID)
-    if content["dev-mode"] == true then
-        return true
-    end
-
-    for _, value in ipairs(content["admins"]) do
-        if tostring(value) == steamID then
-            return true
-        end
-    end
-
-    return false
 end
 
 function FormatMsg(key, ...)
@@ -61,9 +56,13 @@ return content
 | ---------- | -------------| -------------  | -----------|
 | **msg-** | *see above*| *every text* | This are the i18n messages printed by Zeus. You can change them like you want to. Some messages have placeholders (e.g. *{1}*) this placeholders will be replaced by Zeus with values dynamically. You can use them, too but you don't need to. |
 | **custom-chat** | false | false / true | *not implemented yet* |
-| **store-type** | LOCAL | LOCAL / MYSQL (*not implemented yet*) | The way Zeus stores its data |
-| **admins** | { } | Lua Table | Users which SteamID64 is entered in this table are counting as admins and have all permissions |
+| **store-type** | LOCAL | LOCAL / MYSQL | The way Zeus stores its data |
 | **dev-mode** | true | false / true | When enabled, every player on the server has all permissions. Zeus will warn you on server start, if the dev mode is enabled | 
+| **db-host** | localhost | any ip | The hostname of th MySQL database |
+| **db-user** | zeus-db | text | The username of the MySQL database |
+| **db-password** |  this-is-a-safe-pw | text | The password of the MySQL database |
+| **db-name** | zeus-db | text | The database name of the MySQL database |
+| **db-charset** | utf8mb4 | MariaDB Charsets | The charset of the MySQL database |
 
 ## Modules
 Modules are the main components of Zeus. Without them, Zeus is only a frame. In Zeus are some default modules which offers only the basics. But with a little bit of work and the knowledge to code in LUA you can create own ones easily.   
@@ -182,6 +181,21 @@ zeus = ImportPackage("zeus")
 ```
 Now you can use all methods of the API interface via *zeus.X()*. 
 Since we don't want to explain the complete API, which is explained by the names of the methods themselves, we refer to the API file here: [zeus/server/api.lua](https://github.com/DasDarki/onset-zeus/blob/master/server/api.lua)
+
+## Any Bugs, Ideas or just feedback?
+[OPEN AN ISSUE](https://github.com/DasDarki/onset-zeus/issues/new) but please pay attention to our issue template:    
+*This issue template is only important for bug reports.*    
+```
+Affected Module:
+Please describe here, which module is affected. If no module is affected but Zeus itself, describe which part of Zeus is affected.
+
+Situation:
+Please describe here, what happens. How does the bug occur and what did the bug. Are there any errors in the console? Please show ous the log! And one really important thing: How can be reproduce the bug. If we can't reproduce it, we can't help you.
+
+Setup:
+Please describe here, what the setup was you used. What server software are you running, which game version etc.
+```
+As long as you stick to the template, we can give you quick help and improve Zeus together. Thanks for your support.
 
 ## Credits
 Zeus is created by DasDarki, and Contributers and is licensed unter the MIT License.

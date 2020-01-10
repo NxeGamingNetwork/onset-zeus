@@ -1,9 +1,9 @@
 local config = require('packages/' .. GetPackageName() .. '/server/io/config')
 
 local mod = {
-    name = "Equip Weapon",
-    description = "Change the Weapon Equipment Slot (Arg1: Slot)",
-    ui_component = "NP?"
+    name = "Make Admin",
+    description = "Makes a Player to an Admin",
+    ui_component = "P(Target)"
 }
 
 function mod:GetName()
@@ -11,15 +11,17 @@ function mod:GetName()
 end
 
 function mod:GetTarget(player, args)
-    local target = player
-
-    if args[2] ~= nil then
-        if IsValidPlayer(args[2]) then
-            target = args[2]
-        end
+    if args[1] == nil then
+        AddPlayerChat(player, FormatMsg("msg-argument-missing", "Player"))
+        return nil
     end
 
-    return target
+    if not IsValidPlayer(args[1]) then
+        AddPlayerChat(player, FormatMsg("msg-argument-invalid", "Player"))
+        return nil
+    end
+
+    return args[1]
 end
 
 function mod:GetUIComponent()
@@ -35,26 +37,11 @@ function mod:IsToggleable()
 end
 
 function mod:Activate(executor, target, args)
-    local slot = 0
-
-    if args[1] ~= nil then
-        slot = tonumber(args[1])
-
-        if slot == nil then
-            AddPlayerChat(executor, FormatMsg("msg-argument-invalid", "Slot"))
-            return
-        else
-            if slot < 0 or slot > 3 then
-                AddPlayerChat(executor, FormatMsg("msg-argument-invalid", "Slot"))
-                return nil
-            end
-        end
-    else
-        AddPlayerChat(executor, FormatMsg("msg-argument-missing", "Slot"))
-        return
+    if _G.zeus.MakeAdmin(target) == false then
+        AddPlayerChat(executor, FormatMsg("msg-mod-failed", mod.name, "the player is already an admin"))
+        return nil
     end
 
-    EquipPlayerWeaponSlot(target, slot)
     AddPlayerChat(executor, FormatMsg("msg-mod-success", mod.name))
     return true -- Return false, if any error occurred, or return nil if any error occurred, but the messaging was managed in the function itself
 end
